@@ -622,7 +622,7 @@ public class Main {
         }
     }
 
-    // Builds the hint, example: [1 ACTIVE / 2 INACTIVE]
+
     private static String choiceHint(List<String> options) {
         String hint = "[";
         for (int i = 0; i < options.size(); i++) {
@@ -634,7 +634,6 @@ public class Main {
         return hint + "]";
     }
 
-    // Every saved record in one list (a List<Identifiable>)
     private static List<Identifiable> allRecords() {
         List<Identifiable> all = new ArrayList<>();
         all.addAll(departments);
@@ -744,9 +743,6 @@ public class Main {
         }
     }
 
-    // =====================================================================
-    // 5. THE FORMS: which fields each type has, and how to build the object
-    // =====================================================================
 
     private static void addPersonFields(List<Field> f) {
         f.add(idField("Person ID"));
@@ -877,8 +873,7 @@ public class Main {
         return f;
     }
 
-    // Turns the answers into the real object.
-    // v[0] is field 01, v[1] is field 02, and so on. (String) etc. tell Java the type.
+
     private static Registrable build(String type, Object[] v)
             throws ValidationException, DuplicateRecordException, BookUnavailableException {
         switch (type) {
@@ -919,7 +914,7 @@ public class Main {
             case "Enrollment": {
                 Enrollment e = new Enrollment((String) v[0], (Student) v[1], (Course) v[2],
                         (LocalDate) v[3], (String) v[4], (String) v[5]);
-                // No duplicate ACTIVE enrollment: same student + course + semester
+
                 for (Enrollment old : enrollments) {
                     if (old != beingEdited && old.isActive() && e.isActive()
                             && old.getStudent() == e.getStudent()
@@ -957,7 +952,7 @@ public class Main {
         throw new IllegalArgumentException("Unknown type: " + type);
     }
 
-    // Puts a new record in the right list
+
     private static void storeRecord(Registrable r) {
         if (r instanceof Department) {
             departments.add((Department) r);
@@ -984,7 +979,7 @@ public class Main {
         }
     }
 
-    // Removes a record from whichever list holds it
+
     private static void removeRecord(Registrable r) {
         departments.remove(r);
         students.remove(r);
@@ -999,7 +994,7 @@ public class Main {
         loans.remove(r);
     }
 
-    // Runs the form for a type and saves the result. Returns null if cancelled.
+
     private static Registrable registerNew(String type) {
         Registrable record = runForm(type.toUpperCase() + " REGISTRATION", type, fieldsFor(type), false);
         if (record == null) {
@@ -1007,7 +1002,7 @@ public class Main {
         }
         storeRecord(record);
 
-        // A new loan takes one copy from the stock (exactly once)
+
         if (record instanceof BookLoan) {
             LibraryBook book = ((BookLoan) record).getBook();
             book.setAvailableCopies(book.getAvailableCopies() - 1);
@@ -1016,11 +1011,8 @@ public class Main {
         return record;
     }
 
-    // =====================================================================
-    // 6. THE OTHER MENU ACTIONS
-    // =====================================================================
 
-    // ---------- 12. Return Library Book ----------
+
     private static void returnBook() {
         List<BookLoan> openLoans = new ArrayList<>();
         for (BookLoan loan : loans) {
@@ -1081,7 +1073,7 @@ public class Main {
         }
     }
 
-    // ---------- 13. View All Records ----------
+
     private static void viewAllRecords() {
         printList("DEPARTMENTS", departments);
         printList("STUDENTS", students);
@@ -1100,7 +1092,7 @@ public class Main {
         readLine("Press ENTER to return to the menu...");
     }
 
-    // "? extends Registrable" means: a list of any type that is Registrable
+
     private static void printList(String title, List<? extends Registrable> list) {
         System.out.println("--- " + title + " (" + list.size() + ") ---");
         if (list.isEmpty()) {
@@ -1112,7 +1104,7 @@ public class Main {
         }
     }
 
-    // ---------- 14. Search Record by ID ----------
+
     private static void searchById() throws RecordNotFoundException {
         String id = readLine("Enter the ID to search (0 to cancel): ");
         if (id.equals("0")) {
@@ -1132,7 +1124,7 @@ public class Main {
         throw new RecordNotFoundException("No record with ID " + id + " was found.");
     }
 
-    // ---------- 15. Update Existing Record ----------
+
     private static void updateRecord() throws RecordNotFoundException {
         String id = readLine("Enter the ID of the record to update (0 to cancel): ");
         if (id.equals("0")) {
@@ -1146,7 +1138,7 @@ public class Main {
             return;
         }
 
-        // Fill the form with the current values, then go straight to the review screen
+
         List<Field> fields = fieldsFor(type);
         Object[] current = valuesOf(old);
         for (int i = 0; i < fields.size(); i++) {
@@ -1176,7 +1168,7 @@ public class Main {
         System.out.println("+ Record updated: " + updated.getRegistrationSummary());
     }
 
-    // The name of the type of a record
+
     private static String typeOf(Registrable r) {
         if (r instanceof Department) return "Department";
         if (r instanceof Student) return "Student";
@@ -1191,7 +1183,7 @@ public class Main {
         return "Book Loan";
     }
 
-    // The current values of a record, in the SAME order as its form fields
+
     private static Object[] valuesOf(Registrable r) {
         List<Object> v = new ArrayList<>();
 
@@ -1298,7 +1290,7 @@ public class Main {
         return v.toArray();
     }
 
-    // After an update the old object is replaced, so other records must point to the new one
+
     private static void replaceReferences(Registrable oldRecord, Registrable newRecord) {
         if (oldRecord instanceof Department) {
             for (Student s : students) {
@@ -1347,7 +1339,7 @@ public class Main {
         }
     }
 
-    // ---------- 16. Student Academic Summary ----------
+
     private static void studentSummary() throws PrerequisiteMissingException {
         Student s = chooseStudent();
         if (s == null) {
@@ -1404,7 +1396,7 @@ public class Main {
         }
     }
 
-    // Simple numbered list of students (no registration here, it is a report)
+
     private static Student chooseStudent() throws PrerequisiteMissingException {
         if (students.isEmpty()) {
             throw new PrerequisiteMissingException("No student exists. Register a student first.");
@@ -1431,7 +1423,7 @@ public class Main {
         }
     }
 
-    // ---------- 17. Student Payment History ----------
+
     private static void paymentHistory() throws PrerequisiteMissingException {
         Student s = chooseStudent();
         if (s == null) {
@@ -1455,7 +1447,7 @@ public class Main {
         }
     }
 
-    // ---------- 18. View Available Books ----------
+
     private static void showAvailableBooks() {
         System.out.println("========== AVAILABLE BOOKS ==========");
         int count = 0;
@@ -1470,7 +1462,7 @@ public class Main {
         }
     }
 
-    // ---------- 19. Demonstrate Polymorphism ----------
+
     private static void demonstratePolymorphism() {
         System.out.println("========== POLYMORPHISM DEMO ==========");
 
@@ -1497,7 +1489,6 @@ public class Main {
             people.get(0).printDetails();
         }
 
-        // Part 2: one List<Identifiable> holding unrelated records
         List<Identifiable> everything = allRecords();
         System.out.println("--- PART 2: List<Identifiable> (interface polymorphism) ---");
         if (everything.isEmpty()) {
@@ -1509,7 +1500,7 @@ public class Main {
             }
         }
 
-        // Part 3: explanations
+
         System.out.println("--- PART 3: Explanations ---");
         System.out.println("   * Person and AcademicMember are abstract. They have unfinished methods");
         System.out.println("     (getRoleDescription / getAcademicCategory), so Java refuses new Person(...).");
